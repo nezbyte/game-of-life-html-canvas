@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8"> 
+    <title>Game of Life</title>
+</head>
+<body>
+    <div id='game'>
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var c = document.getElementById("game-canvas");
+            var ctx = c.getContext("2d");
+            var black = "#000000";
+            var white = "#FFFFFF";
+            var squareLength = 10;
+            ctx.fillStyle = black;
+            var rows = 70;
+            var columns = 100;
+            var arg = 1;
+            c.width = columns * squareLength;
+            c.height = rows * squareLength;
+
+            var drawBoard = function(game_board) {
+                // console.log('-------------------');
+                for (var i=0; i<rows; i++) {
+                    row = arg +'|'+i+'| ';
+                    for (var j=0; j<columns; j++) {
+                        if (game_board[i][j]) {
+                            ctx.fillStyle = black;
+                            row += '1'
+                        }
+                        else {
+                            ctx.fillStyle = white;
+                            row += '0'
+                        }
+                        ctx.fillRect(j*squareLength,i*squareLength,squareLength,squareLength);
+                    }
+                    // console.log(row);
+                }
+                arg +=1;
+            };
+            var getInitialBoard = function() {
+                var game_board = []
+                for (var i=0; i<rows; i++) {
+                    var row = [];
+                    for (var j=0; j<columns; j++) {
+                        var alive = true;
+                        // ctx.fillStyle = black;
+                        if (Math.round(Math.random()) == 0) {
+                            alive = false;
+                            // ctx.fillStyle = white;
+                        }
+                        // ctx.fillRect(i*squareLength,j*squareLength,squareLength,squareLength);
+                        row.push(alive);
+                    }
+                    game_board.push(row);
+                }
+                return game_board;
+            }
+            var getInitialBoard2 = function() {
+                var game_board = []
+                for (var i=0; i<rows; i++) {
+                    var row = [];
+                    for (var j=0; j<columns; j++) {
+                        var alive = false;
+                        // ctx.fillStyle = black;
+                        if (i < 3 && j < 3) {
+                            alive = true;
+                            // ctx.fillStyle = white;
+                        }
+                        // ctx.fillRect(i*squareLength,j*squareLength,squareLength,squareLength);
+                        row.push(alive);
+                    }
+                    game_board.push(row);
+                }
+                return game_board;
+            }
+            var refreshBoard = function(game_board) {
+                var new_board = [];
+                // console.log('-----------------');
+                for (var i=0; i<rows;i++) {
+                    var row_str = arg + '|' + i + '| '
+                    var row = [];
+                    var top_row = (i == 0);
+                    var bottom_row = (i == rows-1);
+                    for (var j=0; j<columns; j++) {
+                        var left_column = (j == 0);
+                        var right_column = (j == columns-1);
+                        var alive = game_board[i][j];
+                        var population = 0;
+                        // Check top cells
+                        var aliveCells = [];
+                        if (!top_row) {
+                            if (!left_column) {
+                                // Check top left cell
+                                if (game_board[i-1][j-1]) {
+                                    population += 1;
+                                    aliveCells.push('top-left');
+                                }
+                            }
+                            // Check top middle cell
+                            if (game_board[i-1][j]) {
+                                population += 1;
+                                aliveCells.push('top-middle');
+                            }
+                            if (!right_column) {
+                                // Check top right cell
+                                if (game_board[i-1][j+1]) {
+                                    population += 1;
+                                    aliveCells.push('top-right');
+                                }
+                            }
+                        }
+                        // Check center cells
+                        if (!left_column) {
+                            // Check center left cell
+                            if (game_board[i][j-1]) {
+                                population += 1;
+                                aliveCells.push('center-left');
+                            }
+                        }
+                        if (!right_column) {
+                            // Check center right cell
+                            if (game_board[i][j+1]) {
+                                population += 1;
+                                aliveCells.push('center-right');
+                            }
+                        }
+                        // Check bottom cells
+                        if (!bottom_row) {
+                            if (!left_column) {
+                                // Check bottom left cell
+                                if (game_board[i+1][j-1]) {
+                                    population += 1;
+                                    aliveCells.push('bottom-left');
+                                }
+                            }
+                            // Check bottom middle cell
+                            if (game_board[i+1][j]) {
+                                population += 1;
+                                aliveCells.push('bottom-middle');
+                            }
+                            if (!right_column) {
+                                // Check bottom right cell
+                                if (game_board[i+1][j+1]) {
+                                    population += 1;
+                                    aliveCells.push('bottom-right');
+                                }
+                            }
+                        }
+                        if (alive) {
+                            if (population < 2) {
+                                alive = false;
+                            }
+                            else if (population == 2 || population == 3) {
+                                alive = true;
+                            }
+                            else if (population > 3) {
+                                alive = false;
+                            }
+                        }
+                        else{ 
+                            if (population == 3) {
+                                alive = true;
+                            }
+                        }
+                        if (alive) {
+                            row_str += '1'
+                        } 
+                        else {
+                            row_str += '0'
+                        }
+                        row.push(alive);
+                    }
+                    new_board.push(row);
+                }
+                drawBoard(new_board);
+                return new_board;
+            }
+
+            var board = getInitialBoard();
+            drawBoard(board);
+            setInterval(function() {board = refreshBoard(board);}, 100);
+        });
+    </script
+</body>
+
